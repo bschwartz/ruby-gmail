@@ -1,4 +1,5 @@
 require 'net/imap'
+require 'gmail_imap'
 
 class Gmail
   VERSION = '0.0.9'
