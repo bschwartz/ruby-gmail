@@ -34,7 +34,10 @@ class Gmail
 	end
 	def message_id
 		@message_id ||= @envelope ? @envelope.message_id : self.header['Message-ID'].value
-	end
+  end
+  def thread_id
+    @thread_id ||= @gmail.in_mailbox(@mailbox) { @gmail.imap.uid_fetch(uid, "X-GM-THRID")[0].attr['X-GM-THRID'] }
+  end
 	def envelope
 		@envelope ||= @gmail.in_mailbox(@mailbox) { @gmail.imap.uid_fetch(uid, "ENVELOPE")[0].attr["ENVELOPE"] }
 	end
@@ -50,6 +53,11 @@ class Gmail
 	def to
 		@envelope ? @envelope.to : self.header['To'].value
 	end
+
+  # get all the messages that are part of this thread
+  def all_messages_in_thread
+    @all_messages_in_thread ||= @gmail.allmail.emails(['X-GM-THRID', thread_id.to_s])
+  end
 
 	def has_label?(label)
 		return true if @mailbox == @gmail.mailbox(label)
